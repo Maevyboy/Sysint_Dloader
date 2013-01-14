@@ -71,19 +71,19 @@ public class UploadService extends HttpServlet {
 
 					// init sqs
 					AmazonSQS aSqs = AwsSQSCredentials.getIns(
-							"AwsCredentials.properties")
-							.initSqsCredentials();
+							"AwsCredentials.properties").initSqsCredentials();
 					SqsUtil sqs = new SqsUtil(aSqs);
-//					sqs.createQueue("test2013");
-					
+					sqs.createQueue("test2013");
+
 					String[] nextLine;
 					while ((nextLine = csvReader.readNext()) != null) {
+						sqs.sendSqsMessage("test2013", nextLine[0]);
 						System.out.println(nextLine[0]);
 					}
-					
-					for (int i = 0; i < 11; i++) {
-						sqs.sendSqsMessage("test2013", "link_"+i);
-					}
+
+					// for (int i = 0; i < 20; i++) {
+					// sqs.sendSqsMessage("test2013", "link_" + i);
+					// }
 
 					// AmazonS3 awsS3 = AwsS3Credentials.getIns(
 					// "AwsCredentials.properties").initCredentials();
