@@ -10,7 +10,7 @@
 
 	<form method="post" enctype="multipart/form-data"
 		action="/SI_Download_Service/UploadService">
-		<input type="file" size=20 name="fname"> <input type="Submit"
+		<input type="file" size=20 name="fname" accept="*.csv"> <input type="Submit"
 			value="Upload">
 	</form>
 
