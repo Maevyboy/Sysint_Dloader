@@ -2,10 +2,12 @@ package de.fhb.dlService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,12 +18,15 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import au.com.bytecode.opencsv.CSVReader;
+
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.sqs.AmazonSQS;
 
 /**
  * Servlet implementation class UploadService
  */
-
+@WebServlet("/UploadService")
 public class UploadService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -60,9 +65,29 @@ public class UploadService extends HttpServlet {
 					String filename = item.getName();
 					InputStream filecontent = item.getInputStream();
 
-					AmazonS3 awsS3 = AwsS3Credentials.getIns(
-							"AwsCredentials.properties").initCredentials();
-					BucketUtil bucket = new BucketUtil(awsS3);
+					InputStreamReader inReader = new InputStreamReader(
+							filecontent);
+					CSVReader csvReader = new CSVReader(inReader);
+
+					// init sqs
+					AmazonSQS aSqs = AwsSQSCredentials.getIns(
+							"AwsCredentials.properties")
+							.initSqsCredentials();
+					SqsUtil sqs = new SqsUtil(aSqs);
+//					sqs.createQueue("test2013");
+					
+					String[] nextLine;
+					while ((nextLine = csvReader.readNext()) != null) {
+						System.out.println(nextLine[0]);
+					}
+					
+					for (int i = 0; i < 11; i++) {
+						sqs.sendSqsMessage("test2013", "link_"+i);
+					}
+
+					// AmazonS3 awsS3 = AwsS3Credentials.getIns(
+					// "AwsCredentials.properties").initCredentials();
+					// BucketUtil bucket = new BucketUtil(awsS3);
 				}
 			}
 		} catch (FileUploadException e) {
@@ -71,8 +96,8 @@ public class UploadService extends HttpServlet {
 
 		// response write
 		Writer writer = response.getWriter();
-		writer.write("Erfolgreich Hochgeladen.");
-		writer.write("<a href=\"/SI_Download_Service/\">Visit W3Schools</a>");
+		writer.write("Upload Successful.");
+		writer.write("<a href=\"/SI_Download_Service/\">Back</a>");
 
 		// response.sendRedirect(response.encodeRedirectURL("/SI_Download_Service/"));
 
