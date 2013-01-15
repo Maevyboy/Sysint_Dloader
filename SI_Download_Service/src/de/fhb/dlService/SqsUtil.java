@@ -21,7 +21,7 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 public class SqsUtil {
     /** The aws sqs credentials instance*/
-    public AmazonSQS sqs = null;
+    private AmazonSQS sqs = null;
 
     /**
      * The constructor
@@ -54,7 +54,7 @@ public class SqsUtil {
 
     /**
      * Gets the message from a named queue
-     * @param aQueueName
+     * @param aQueueName the given queue name
      * @return a list containing all received messages
      */
     public ArrayList<Message> getMessagefromAnotherEntrypoint(String aQueueName) {
@@ -85,7 +85,7 @@ public class SqsUtil {
      * @param aQueueName the given queue name
      * @return the queueUrl
      */
-    public String getQueueUrl(String aQueueName) {
+    private String getQueueUrl(String aQueueName) {
         GetQueueUrlRequest queueUrlRequest = new GetQueueUrlRequest(aQueueName);
         GetQueueUrlResult queueUrlResult = sqs.getQueueUrl(queueUrlRequest);
         String queueUrl = queueUrlResult.getQueueUrl();
@@ -95,7 +95,7 @@ public class SqsUtil {
     /**
      * Deletes designated Message
      * @param aQueueName the queue name
-     * @param aMessage the message
+     * @param aMessage the given message
      */
     public void deleteMessageAfterRead(String aQueueName, Message aMessage) {
         String aQueueUrl = getQueueUrl(aQueueName);
