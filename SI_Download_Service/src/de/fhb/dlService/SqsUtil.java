@@ -8,6 +8,7 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.GetQueueUrlRequest;
 import com.amazonaws.services.sqs.model.GetQueueUrlResult;
+import com.amazonaws.services.sqs.model.ListQueuesResult;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
@@ -99,5 +100,25 @@ public class SqsUtil {
     public void deleteMessageAfterRead(String aQueueName, Message aMessage) {
         String aQueueUrl = getQueueUrl(aQueueName);
         sqs.deleteMessage(new DeleteMessageRequest(aQueueUrl, aMessage.getReceiptHandle()));
+    }
+
+    /**
+     * Checks if a queue of a given name already exists
+     * @param aQueueName the given queue name
+     * @return true if queue found
+     */
+    public boolean checkIfQueueExist(String aQueueName) {
+        ListQueuesResult listQueueRes = sqs.listQueues();
+        List<String> queueUrlLst = listQueueRes.getQueueUrls();
+        String targetQueueUrl = getQueueUrl(aQueueName);
+        if (queueUrlLst != null) {
+            for (String queueUrl : queueUrlLst) {
+                if (queueUrl.equals(targetQueueUrl)) {
+                    return true;
+                }
+            }
+
+        }
+        return false;
     }
 }
