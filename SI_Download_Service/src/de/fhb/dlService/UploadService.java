@@ -1,5 +1,6 @@
 package de.fhb.dlService;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,6 +59,12 @@ public class UploadService extends HttpServlet {
 			ServletFileUpload upload = new ServletFileUpload(factory);
 			List<FileItem> items = upload.parseRequest(request);
 
+			// init sqs
+			AmazonSQS aSqs = AwsSQSCredentials.getIns(
+					"AwsCredentials.properties").initSqsCredentials();
+			SqsUtil sqs = new SqsUtil(aSqs);
+			sqs.createQueue("Links2013");
+
 			for (FileItem item : items) {
 				if (item.isFormField()) {
 				} else {
@@ -69,27 +76,25 @@ public class UploadService extends HttpServlet {
 							filecontent);
 					CSVReader csvReader = new CSVReader(inReader);
 
-					// init sqs
-					AmazonSQS aSqs = AwsSQSCredentials.getIns(
-							"AwsCredentials.properties").initSqsCredentials();
-					SqsUtil sqs = new SqsUtil(aSqs);
-					sqs.createQueue("test2013");
-
 					String[] nextLine;
 					while ((nextLine = csvReader.readNext()) != null) {
-						sqs.sendSqsMessage("test2013", nextLine[0]);
+						sqs.sendSqsMessage("Links2013", nextLine[0]);
 						System.out.println(nextLine[0]);
 					}
 
 					// for (int i = 0; i < 20; i++) {
 					// sqs.sendSqsMessage("test2013", "link_" + i);
 					// }
-
-					// AmazonS3 awsS3 = AwsS3Credentials.getIns(
-					// "AwsCredentials.properties").initCredentials();
-					// BucketUtil bucket = new BucketUtil(awsS3);
 				}
 			}
+
+			// AmazonS3 awsS3 = AwsS3Credentials.getIns(
+			// "AwsCredentials.properties").initCredentials();
+			// BucketUtil bucket = new BucketUtil(awsS3);
+			// // bucket.createABucket("dloaderbucket");
+			// bucket.uploadOntoBucket("dloaderbucket", new File(
+			// "AwsCredentials.properties"),
+			// "AwsCredentials.properties");
 		} catch (FileUploadException e) {
 			e.printStackTrace();
 		}
@@ -104,5 +109,4 @@ public class UploadService extends HttpServlet {
 		// RequestDispatcher rd = getServletContext().getRequestDispatcher("/");
 		// rd.forward(request, response);
 	}
-
 }
