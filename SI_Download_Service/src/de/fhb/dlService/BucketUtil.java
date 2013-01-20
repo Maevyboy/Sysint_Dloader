@@ -1,6 +1,7 @@
 package de.fhb.dlService;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,8 +127,9 @@ public class BucketUtil {
 					byte[] contentBytes;
 
 					contentBytes = IOUtils.toByteArray(is);
-
 					contentLength = Long.valueOf(contentBytes.length);
+					is = new ByteArrayInputStream(contentBytes);
+					
 					ObjectMetadata metadata = new ObjectMetadata();
 					metadata.setContentLength(contentLength);
 					aAmzObj.putObject(new PutObjectRequest(aBckNam, aKey,
