@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,21 +35,26 @@ public class DownloadService extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("application");
+		try {
+			response.setContentType("application/force-download");
+			String key = request.getPathInfo();
+			key = key.substring(1);
 
-		String key = request.getPathInfo();
-		key = key.substring(1);
+			AmazonS3 awsS3 = AwsS3Credentials.getIns(
+					"AwsCredentials.properties").initCredentials();
+			BucketUtil bucket = new BucketUtil(awsS3);
 
-		AmazonS3 awsS3 = AwsS3Credentials.getIns("AwsCredentials.properties")
-				.initCredentials();
-		BucketUtil bucket = new BucketUtil(awsS3);
+			InputStream in = bucket.downloadFromBucket("dloaderbucket", key);
 
-		InputStream in = bucket.downloadFromBucket("dloaderbucket",
-				"putty.exe");
+			OutputStream out = response.getOutputStream();
 
-		OutputStream out = response.getOutputStream();
-
-		IOUtils.copy(in, out);
+			IOUtils.copy(in, out);
+		} catch (Exception e) {
+			response.setContentType("text/html");
+			RequestDispatcher rd = getServletContext().getRequestDispatcher(
+					"/error.html");
+			rd.include(request, response);
+		}
 	}
 
 }

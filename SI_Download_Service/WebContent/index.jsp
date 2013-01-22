@@ -6,26 +6,36 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Main</title>
+<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-
-	<form method="post" enctype="multipart/form-data"
-		action="/SI_Download_Service/UploadService">
-		<input type="file" size=20 name="fname" accept="*.csv"> <input
-			type="Submit" value="Upload">
-	</form>
-
-	<ul>
+	<div id="main">
+		<h3>Choose a File to Upload.</h3>
+		<form method="post" enctype="multipart/form-data"
+			action="/SI_Download_Service/UploadService">
+			<input type="file" size=20 name="fname" accept="*.csv"> <br>
+			<input type="Submit" value="Upload">
+		</form>
 		<%
 			DownloadHelper helper = new DownloadHelper();
 			List<String> links = helper.getDlLinks();
-
-			for (String link : links) {
 		%>
-		<li><a href="DownloadService/<%=link%>"><%=link%></a></li>
-		<%
-			}
-		%>
-	</ul>
+		<table>
+			<%
+				for (int i = 0; i < links.size(); i++) {
+					String link = links.get(i);
+					if (i % 8 == 0) {
+			%>
+			<tr>
+				<%
+					}
+				%>
+				<td><a href="DownloadService/<%=link%>"><%=link%></a></td>
+				<%
+					}
+				%>
+			</tr>
+		</table>
+	</div>
 </body>
 </html>

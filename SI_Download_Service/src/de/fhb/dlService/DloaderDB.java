@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fhb.dloader;
+package de.fhb.dlService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

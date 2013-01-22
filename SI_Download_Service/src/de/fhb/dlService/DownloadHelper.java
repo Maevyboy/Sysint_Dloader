@@ -8,30 +8,31 @@ import java.util.List;
 import au.com.bytecode.opencsv.CSVReader;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
+import com.amazonaws.services.simpledb.model.Attribute;
+import com.amazonaws.services.simpledb.model.Item;
 
 public class DownloadHelper {
 
 	public List<String> getDlLinks() {
 		List<String> links = new ArrayList<String>();
-		links.add("link_1");
-		links.add("link_2");
+		// for (int i = 0; i < 200; i++) {
+		// links.add("link_" + i);
+		// }
 
 		try {
-			AmazonS3 awsS3 = AwsS3Credentials.getIns(
+			AmazonSimpleDBClient awsSimple = AwsSimpleDBCredentials.getIns(
 					"AwsCredentials.properties").initCredentials();
-			BucketUtil bucket = new BucketUtil(awsS3);
+			DloaderDB aSdb = new DloaderDB(awsSimple);
 
-			// bucket.downloadFromBucket("", aKey)
-			//
-			// InputStreamReader inReader = new InputStreamReader(
-			// filecontent);
-			// CSVReader csvReader = new CSVReader(inReader);
-			//
-			// String[] nextLine;
-			// while ((nextLine = csvReader.readNext()) != null) {
-			// links.add(nextLine[0]);
-			// System.out.println(nextLine[0]);
-			// }
+			List<Item> itemLst = aSdb.getDloaderLinks("dloaderdomain");
+			for (Item item : itemLst) {
+				List<Attribute> attrLst = item.getAttributes();
+				for (Attribute attribute : attrLst) {
+					links.add(attribute.getName());
+				}
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
