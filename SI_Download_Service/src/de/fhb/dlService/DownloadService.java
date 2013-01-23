@@ -16,7 +16,10 @@ import org.apache.commons.io.IOUtils;
 import com.amazonaws.services.s3.AmazonS3;
 
 /**
- * Servlet implementation class DownloadService
+ * Servlet implementation class DownloadService. This class extracts the
+ * filename of the url, initiates a connection to s3 service and gets the file
+ * with the extracted file name from there. The file is provided to the client
+ * as a download.
  */
 @WebServlet("/DownloadService/*")
 public class DownloadService extends HttpServlet {

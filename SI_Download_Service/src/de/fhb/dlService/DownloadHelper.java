@@ -13,6 +13,12 @@ import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 import com.amazonaws.services.simpledb.model.Attribute;
 import com.amazonaws.services.simpledb.model.Item;
 
+/**
+ * A Helper class to get the file names which are stored in SimpleDB.
+ * 
+ * @author Tony
+ * 
+ */
 public class DownloadHelper {
 
 	public List<String> getDlLinks() {

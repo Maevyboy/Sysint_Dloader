@@ -1,10 +1,8 @@
 package de.fhb.dlService;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -16,17 +14,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.sqs.AmazonSQS;
 
 /**
- * Servlet implementation class UploadService
+ * Servlet implementation class UploadService. This class undertake the upload
+ * process. The csv file in the post request will extracted and the download
+ * links are send to sqs one after another.
  */
 @WebServlet("/UploadService")
 public class UploadService extends HttpServlet {
@@ -54,14 +52,12 @@ public class UploadService extends HttpServlet {
 			for (FileItem item : items) {
 				if (item.isFormField()) {
 				} else {
-					String fieldname = item.getFieldName();
-					String filename = item.getName();
 					InputStream filecontent = item.getInputStream();
-
 					InputStreamReader inReader = new InputStreamReader(
 							filecontent);
 					CSVReader csvReader = new CSVReader(inReader);
 
+					// send all links to sqs
 					String[] nextLine;
 					while ((nextLine = csvReader.readNext()) != null) {
 						sqs.sendSqsMessage("Links2013", nextLine[0]);
